@@ -1,4 +1,4 @@
-# 随机壁纸 0.0.1
+# 随机壁纸 0.0.2
 
 ## 简介
 
@@ -11,7 +11,9 @@
 
 桌面壁纸用久了就有些腻了，这时候可以随机获取几张壁纸，设为桌面，换换壁纸，换换心情~
 
-另外这是一个`hackable`的插件哟，手动滑稽
+## 项目地址
+
+[https://github.com/fofolee/uTools-RandomWallpapers](https://github.com/fofolee/uTools-RandomWallpapers)
 
 ## 预览
 
