@@ -1,0 +1,16 @@
+{
+    "pluginName": "随机壁纸",
+    "description": "随机获取四张壁纸，选择设为桌面，换换壁纸，换换心情",
+    "main": "index.html",
+    "version": "0.0.1",
+    "author": "云之轩",
+    "preload": "preload.js",
+    "logo": "logo.png",
+    "unpack":"setDesktop.cs",
+    "platform": ["win32", "darwin", "linux"],
+    "features": [{
+        "code": "wallpaper",
+        "explain": "随机获得壁纸",
+        "cmds": ["wallpaper", "壁纸"]
+    }]
+}
