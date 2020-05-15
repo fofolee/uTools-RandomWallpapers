@@ -2,13 +2,13 @@ const fs = require('fs')
 const path = require('path')
 const { exec } = require('child_process');
 
-isDev = /unsafe-\w+\.asar/.test(__dirname) ? false : true
+isDev = /[a-zA-Z0-9\-]+\.asar/.test(__dirname) ? false : true
 
 GetFilePath = File => {
     if (isDev) {
         return path.join(__dirname, 'script', File)
     } else {
-        return path.join(__dirname.replace(/(unsafe-\w+\.asar)/,'$1.unpacked'), 'script', File)  
+        return path.join(__dirname.replace(/[a-zA-Z0-9\-]+\.asar/,'$1.unpacked'), 'script', File)  
     }
 }
 
