@@ -1,12 +1,3 @@
-pushData = (databases, data) => {
-    var db = utools.db.get(databases);
-    if (db) {
-        utools.db.put({ _id: databases, data: data, _rev: db._rev });
-    } else {
-        utools.db.put({ _id: databases, data: data });
-    }
-}
-
 get = (url, buffer) =>
     new Promise((reslove, reject) => {
         var xhr = new XMLHttpRequest();
@@ -52,6 +43,7 @@ fetchWallpaper = async () => {
 }
 
 utools.onPluginEnter(async () => {
+    if(isRunningAtFirstTime()) showChangeLog()
     utools.setExpendHeight(480)
     if (!window.WallPapers) {
         try {
