@@ -22,11 +22,11 @@ desktop=${desktop,,} # convert to lower case
 case $desktop in
   # For DDE (Deepin)
   dde)
-    gsettings set "com.deepin.wrap.gnome.desktop.background picture-uri $bg_path"
+    gsettings set com.deepin.wrap.gnome.desktop.background picture-uri "$bg_path"
     ;;
   gnome)
     # For distributions using Gnome (like Ubuntu)
-    gsettings set "org.gnome.desktop.background picture-uri file:///$bg_path"
+    gsettings set org.gnome.desktop.background picture-uri "$bg_path"
     ;;
   kde)
     # For those who useing KDE (like Manjaro)
