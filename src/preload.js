@@ -64,6 +64,9 @@ setDesktop = path => {
             err && utools.showNotification(stderr)
         })
     } else {
-        utools.showNotification('不支持 Linux')
+        var script = GetFilePath('set_wallpaper_linux.sh')
+        exec(`bash "${script}" "${path}"`, (err, stdout, stderr) => {
+            err && utools.showNotification(stderr)
+        })
     }
 }
