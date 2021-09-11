@@ -43,7 +43,7 @@ fetchWallpaper = async () => {
 }
 
 utools.onPluginEnter(async () => {
-    if(isRunningAtFirstTime()) showChangeLog()
+    // if(isRunningAtFirstTime()) showChangeLog()
     utools.setExpendHeight(480)
     if (!window.WallPapers) {
         try {

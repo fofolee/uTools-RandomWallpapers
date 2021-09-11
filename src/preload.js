@@ -11,24 +11,24 @@ pushData = (databases, data) => {
     }
 }
 
-showChangeLog = () => {
-    pushData('plugin', { version: pluginInfo.version })
-    var log = fs.readFileSync(path.join(__dirname,'CHANGELOG.MD'), {encoding: 'utf8'})
-    if(log) utools.ubrowser.goto(log, '更新日志').run()
-}
+// showChangeLog = () => {
+//     pushData('plugin', { version: pluginInfo.version })
+//     var log = fs.readFileSync(path.join(__dirname,'CHANGELOG.MD'), {encoding: 'utf8'})
+//     if(log) utools.ubrowser.goto(log, '更新日志').run()
+// }
 
-isRunningAtFirstTime = () => {
-    try {
-        var historyVersion = utools.db.get('plugin').data.version
-        if (historyVersion != pluginInfo.version) {
-            return true
-        } else {
-            return false
-        }
-    } catch (error) {
-        return true
-    }
-}
+// isRunningAtFirstTime = () => {
+//     try {
+//         var historyVersion = utools.db.get('plugin').data.version
+//         if (historyVersion != pluginInfo.version) {
+//             return true
+//         } else {
+//             return false
+//         }
+//     } catch (error) {
+//         return true
+//     }
+// }
 
 pluginInfo = JSON.parse(fs.readFileSync(path.join(__dirname, 'plugin.json')))
 
