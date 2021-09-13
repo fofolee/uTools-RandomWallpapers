@@ -1,4 +1,4 @@
-# 随机壁纸 0.0.3
+# 随机壁纸 0.0.5
 
 ## 简介
 
@@ -17,8 +17,8 @@
 
 ## 预览
 
-![YDkF6x.png](https://s1.ax1x.com/2020/05/14/YDkF6x.png)
+![](https://i.loli.net/2021/09/13/cZnzr9GdLMUl5bo.jpg)
 
-![YDkBj0.png](https://s1.ax1x.com/2020/05/14/YDkBj0.png)
+![](https://i.loli.net/2021/09/13/ZAP1B4qIDlTkYFm.jpg)
 
-![YDkWC9.png](https://s1.ax1x.com/2020/05/14/YDkWC9.png)
+![](https://i.loli.net/2021/09/13/CbNPfOFDlQ43pjA.jpg)
