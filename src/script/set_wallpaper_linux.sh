@@ -11,11 +11,10 @@ function set_with_third_part_tools() {
 }
 
 # Detect desktop environment
-if [ "$XDG_CURRENT_DESKTOP" = "" ]; then
-  desktop=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
-else
-  desktop=$XDG_CURRENT_DESKTOP
-fi
+# utools 在执行插件时会出现环境变量丢失的问题，故优先采用查看进程的方式判断桌面环境，只在 gnome 上做了测试
+desktop=$(ps -ef | egrep -v "grep" | grep -Eo "dde|gnome|kde|xface|mate" | uniq)
+[ -z $desktop ] && desktop=$XDG_CURRENT_DESKTOP
+[ -z $desktop ] && desktop=$(echo "$XDG_DATA_DIRS" | grep -Eo 'xfce|kde|gnome')
 desktop=${desktop,,} # convert to lower case
 
 # Set Wallpaper
