@@ -43,7 +43,7 @@ fetchWallpaper = async () => {
 }
 
 utools.onPluginEnter(async () => {
-    // if(isRunningAtFirstTime()) showChangeLog()
+    window.MoveHistoricalWallpapers()
     utools.setExpendHeight(480)
     if (!window.WallPapers) {
         try {
@@ -91,7 +91,7 @@ showOptions = i => {
             setWallPaper = async () => {
                 var img = await downloadImg()
                 if (img) {
-                    var path = window.joinpath(utools.getPath('temp'), window.WallPapers[i].path.split('/').pop())
+                    var path = window.joinpath(window.getWallpapersFolder().path, window.WallPapers[i].path.split('/').pop())
                     window.saveImg(path, window.toBuffer(img))
                     setDesktop(path)
                 }
@@ -257,6 +257,10 @@ document.querySelector('#givemefour').onclick = async function () {
 
 document.querySelector('#preference').onclick = function () {
     showPreferences()
+}
+
+document.querySelector('#history').onclick = function () {
+    utools.shellOpenPath(window.getWallpapersFolder().path)
 }
 
 for (var i = 0; i < 4; i++) {
