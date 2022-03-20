@@ -1,4 +1,4 @@
-# 随机壁纸 0.0.5
+# 随机壁纸 0.0.7
 
 ## 简介
 
@@ -11,13 +11,23 @@
 
 桌面壁纸用久了就有些腻了，这时候可以随机获取几张壁纸，设为桌面，换换壁纸，换换心情~
 
-## 项目地址
+## 原项目
 
-[https://github.com/fofolee/uTools-RandomWallpapers](https://github.com/fofolee/uTools-RandomWallpapers)
+地址：[https://github.com/fofolee/uTools-RandomWallpapers](https://github.com/fofolee/uTools-RandomWallpapers)
+
+作者：[fofolee](https://github.com/fofolee/)
+
+## 本仓库的修改内容：
+
+1、增加了关键词搜索功能（2022/3/20）
+
+2、原版设置Win壁纸会修改所有屏幕壁纸和缩放方式，修改为了仅设置主屏幕壁纸且并不修改缩放方式
 
 ## 预览
 
-![](https://i.loli.net/2021/09/13/cZnzr9GdLMUl5bo.jpg)
+![](https://files.catbox.moe/nyier9.png)
+
+![](https://files.catbox.moe/s6jlx5.png)
 
 ![](https://i.loli.net/2021/09/13/ZAP1B4qIDlTkYFm.jpg)
 
