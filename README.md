@@ -23,9 +23,11 @@
 
 2、原版设置Win壁纸会修改所有屏幕壁纸和缩放方式，修改为了仅设置主屏幕壁纸且并不修改缩放方式
 
-## 预览
+## 修改内容预览
 
 ![](https://files.catbox.moe/nyier9.png)
+
+## 原预览图
 
 ![](https://files.catbox.moe/s6jlx5.png)
 
