@@ -259,7 +259,7 @@ showPreferences = async () => {
 
 searchKeyword = async () => {
     var result = await Swal.fire({
-        title: '输入关键词\n（英文关键词可能会更准确哦！）',
+        title: '输入关键词（建议英文）',
         input: 'text',
         inputAttributes: {
             autocapitalize: 'off'
