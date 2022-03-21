@@ -6,7 +6,7 @@ get = (url, buffer) =>
         xhr.open('GET', url);
         xhr.send();
         xhr.onreadystatechange = () => {
-            if (xhr.readyState == 4){
+            if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     reslove(xhr.response);
                 } else {
@@ -19,7 +19,7 @@ get = (url, buffer) =>
     })
 
 updateImgs = () => {
-    if(window.WallPapers){
+    if (window.WallPapers) {
         var imgs = document.querySelectorAll('#content img')
         for (var i = 0; i < 4; i++) {
             var img = imgs[i]
@@ -34,6 +34,18 @@ updateImgs = () => {
 
 fetchWallpaper = async () => {
     var url = `https://wallhaven.cc/api/v1/search?categories=${window.preferences.categories}&purity=${window.preferences.purity}&atleast=${window.preferences.atleast}&sorting=${window.preferences.sorting}&ratios=16x9&apikey=${window.preferences.apikey}&page=${window.preferences.page}`
+    console.log(url)
+    try {
+        var response = await get(url, false)
+        window.WallPapers = JSON.parse(response).data
+    } catch (e) {
+        console.log(e)
+    }
+}
+
+fetchKeywordWallpaper = async (keyword) => {
+    var url = `https://wallhaven.cc/api/v1/search?q=${keyword}&purity=${window.preferences.purity}&atleast=${window.preferences.atleast}&sorting=relevance&ratios=16x9&apikey=${window.preferences.apikey}&page=${window.preferences.page}`
+    console.log(url)
     try {
         var response = await get(url, false)
         window.WallPapers = JSON.parse(response).data
@@ -71,7 +83,7 @@ showOptions = i => {
         <img class="options" src="img/raw.svg" title="查看原图" onclick=showWallPaper()>
         <img class="options" src="img/paste.svg" title="复制到剪贴板" onclick=copyWallPaper()>
         `,
-        footer: `[${window.WallPapers[i].file_type.split('/')[1].toUpperCase()}][${window.WallPapers[i].resolution}][${(window.WallPapers[i].file_size/1000000).toFixed(2)}M]`,
+        footer: `[${window.WallPapers[i].file_type.split('/')[1].toUpperCase()}][${window.WallPapers[i].resolution}][${(window.WallPapers[i].file_size / 1000000).toFixed(2)}M]`,
         showConfirmButton: false,
         onBeforeOpen: () => {
             downloadImg = async () => {
@@ -120,10 +132,10 @@ showPreferences = async () => {
     var result = await Swal.fire({
         title: "偏好设置",
         onBeforeOpen: () => {
-            for (var i = 0; i < 3; i++){
+            for (var i = 0; i < 3; i++) {
                 document.querySelectorAll("input[name='categories']")[i].checked = parseInt(window.preferences.categories[i])
             }
-            for (var i = 0; i < 3; i++){
+            for (var i = 0; i < 3; i++) {
                 document.querySelectorAll("input[name='purity']")[i].checked = parseInt(window.preferences.purity[i])
             }
             document.getElementById('sorting').value = window.preferences.sorting;
@@ -135,7 +147,7 @@ showPreferences = async () => {
         },
         // backdrop: '#bbb',
         html:
-        `<table>
+            `<table>
         <tr>
             <td width=20%><div class="title">风格分类</div></td>
             <td width=60%>
@@ -245,6 +257,31 @@ showPreferences = async () => {
     }
 }
 
+searchKeyword = async () => {
+    var result = await Swal.fire({
+        title: '输入关键词\n（英文关键词可能会更准确哦！）',
+        input: 'text',
+        inputAttributes: {
+            autocapitalize: 'off'
+        }
+    })
+    if (result.value) {
+        await fetchKeywordWallpaper(result.value)
+        if (window.WallPapers.length != 0) {
+            updateImgs()
+        }else{
+            Swal.fire({
+                text: '所给关键词未查询到内容！'
+            })
+        }
+        
+    }
+}
+
+document.querySelector('#searchbykeyword').onclick = async function () {
+    searchKeyword()
+}
+
 document.querySelector('#givemefour').onclick = async function () {
     if (window.WallPapers.length >= 8) {
         window.WallPapers = window.WallPapers.slice(4)
@@ -254,6 +291,11 @@ document.querySelector('#givemefour').onclick = async function () {
     }
     updateImgs()
 }
+
+// document.querySelector('#givemefourback').onclick = async function () {
+//     //todo
+    
+// }
 
 document.querySelector('#preference').onclick = function () {
     showPreferences()
@@ -273,19 +315,9 @@ for (var i = 0; i < 4; i++) {
 
 document.onkeydown = e => {
     if (e.which == 85 && e.ctrlKey) {
+        window.preferences.unlock = true;
         Swal.fire({
-            title: 'How do you find this ?',
-            input: 'text',
-            inputAttributes: {
-                autocapitalize: 'off'
-            }
-        }).then((result) => {
-            if (result.value == '↑↑↓↓←→←→BABA') {
-                window.preferences.unlock = true;
-                Swal.fire({
-                    text: 'something has changed !'
-                })
-            }
+            text: '天哪，你是怎么发现这个的？'
         })
     }
 }

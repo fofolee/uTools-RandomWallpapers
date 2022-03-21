@@ -11,25 +11,6 @@ pushData = (databases, data) => {
     }
 }
 
-// showChangeLog = () => {
-//     pushData('plugin', { version: pluginInfo.version })
-//     var log = fs.readFileSync(path.join(__dirname,'CHANGELOG.MD'), {encoding: 'utf8'})
-//     if(log) utools.ubrowser.goto(log, '更新日志').run()
-// }
-
-// isRunningAtFirstTime = () => {
-//     try {
-//         var historyVersion = utools.db.get('plugin').data.version
-//         if (historyVersion != pluginInfo.version) {
-//             return true
-//         } else {
-//             return false
-//         }
-//     } catch (error) {
-//         return true
-//     }
-// }
-
 getWallpapersFolder = () => {
     let exists = 1
     let folder = path.join(utools.getPath("pictures"), "uToolsWallpapers")
@@ -82,7 +63,7 @@ setDesktop = path => {
         })
     } else if (utools.isWindows()) {
         var script = GetFilePath('setDesktop.cs')
-        exec(`powershell -NoProfile -Command "Add-Type -Path ${script}; [Wallpaper.Setter]::SetWallpaper('${path}', 'Stretch')"`, (err, stdout, stderr) => {
+        exec(`powershell -NoProfile -Command "Add-Type -Path ${script}; [Wallpaper.Setter]::SetWallpaper('${path}')"`, (err, stdout, stderr) => {
             err && utools.showNotification(stderr)
         })
     } else {
