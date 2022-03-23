@@ -78,10 +78,18 @@ utools.onPluginEnter(async () => {
 
 showOptions = i => {
     Swal.fire({
-        html: `<img class="options" src="img/download.svg" title="下载壁纸" onclick=downloadWallPaper()>
-        <img class="options" src="img/wallpaper.svg" title="设为壁纸" onclick=setWallPaper()>
-        <img class="options" src="img/raw.svg" title="查看原图" onclick=showWallPaper()>
-        <img class="options" src="img/paste.svg" title="复制到剪贴板" onclick=copyWallPaper()>
+        html: `<table class="optionsTable">
+        <tr>
+        <td><img class="options" src="img/download.svg" onclick=downloadWallPaper()></td>
+        <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper()></td>
+        <td><img class="options" src="img/raw.svg" onclick=showWallPaper()></td>
+        <td><img class="options" src="img/paste.svg" onclick=copyWallPaper()></td>
+        <td><img class="options" src="img/script.svg" onclick=runCustomScript()></td>
+        </tr>
+        <tr>
+        <td>下载</td><td>设为壁纸</td><td>原图</td><td>复制</td><td>自定义脚本</td>
+        </tr>
+        </table>
         `,
         footer: `[${window.WallPapers[i].file_type.split('/')[1].toUpperCase()}][${window.WallPapers[i].resolution}][${(window.WallPapers[i].file_size / 1000000).toFixed(2)}M]`,
         showConfirmButton: false,

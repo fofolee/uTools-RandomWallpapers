@@ -65,14 +65,22 @@ body {
     transition: 0.2s;
 }
 
+.optionsTable {
+    width: 300px;
+    text-align: center;
+    margin: 0 auto;
+    font-size: smaller;
+    font-weight: bolder;
+}
+
 .options {
     cursor: pointer;
-    max-width: 48px;
+    width: 45px;
 }
 
 .options:hover {
-    transition: 0.2s;
-    transform: scale(1.1);
+    transition: 0.1s;
+    transform: scale(1.2);
 }
 
 table .swal2-select,
