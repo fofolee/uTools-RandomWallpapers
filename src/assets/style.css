@@ -52,6 +52,19 @@ body {
     transition: 0.5s;
 }
 
+#footer .preferences {
+    float: left;
+    width: 22px;
+    height: 22px;
+    padding: 4px 6px;
+}
+
+#footer .preferences:hover {
+    transform: rotate(360deg);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
 .options {
     cursor: pointer;
     max-width: 48px;

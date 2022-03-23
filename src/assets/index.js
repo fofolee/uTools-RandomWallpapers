@@ -284,18 +284,25 @@ document.querySelector('#searchbykeyword').onclick = async function () {
 
 document.querySelector('#givemefour').onclick = async function () {
     if (window.WallPapers.length >= 8) {
+        window.preferences.historyPapers = window.WallPapers.slice(0, 4)
         window.WallPapers = window.WallPapers.slice(4)
     } else {
+        window.preferences.historyPapers = window.WallPapers.slice(window.WallPapers.length - 4)
         window.preferences.page += 1
         await fetchWallpaper()
     }
+    document.getElementById('givemefourback').style.display = 'block'
     updateImgs()
 }
 
-// document.querySelector('#givemefourback').onclick = async function () {
-//     //todo
-    
-// }
+document.querySelector('#givemefourback').onclick = async function () {
+    if (window.preferences.historyPapers) {
+        window.WallPapers = window.preferences.historyPapers.concat(window.WallPapers)
+        window.preferences.historyPapers = ""
+        document.getElementById('givemefourback').style.display = 'none'
+        updateImgs()
+    }
+}
 
 document.querySelector('#preference').onclick = function () {
     showPreferences()
