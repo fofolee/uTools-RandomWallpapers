@@ -11,6 +11,8 @@ pushData = (databases, data) => {
     }
 }
 
+runCommand = exec
+
 getWallpapersFolder = () => {
     let exists = 1
     let folder = path.join(utools.getPath("pictures"), "uToolsWallpapers")

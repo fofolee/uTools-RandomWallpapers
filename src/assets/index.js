@@ -71,12 +71,14 @@ utools.onPluginEnter(async () => {
                 page: 1
             }
         }
+        if (!window.preferences.customScript) window.preferences.customScript = {}
+        if (!window.preferences.favorites) window.preferences.favorites = []
         await fetchWallpaper()
         updateImgs()
     }
 })
 
-showOptions = i => {
+showOptions = wallpaper => {
     Swal.fire({
         html: `<table class="optionsTable">
         <tr>
@@ -84,18 +86,19 @@ showOptions = i => {
         <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper()></td>
         <td><img class="options" src="img/raw.svg" onclick=showWallPaper()></td>
         <td><img class="options" src="img/paste.svg" onclick=copyWallPaper()></td>
-        <td><img class="options" src="img/script.svg" onclick=runCustomScript()></td>
+        <td><img class="options" src="img/collection.svg" onclick=favIf()></td>
         </tr>
         <tr>
-        <td>下载</td><td>设为壁纸</td><td>原图</td><td>复制</td><td>自定义脚本</td>
+        <td>下载</td><td>设为壁纸</td><td>原图</td><td>复制</td>
+        <td id="favIf">${window.preferences.favorites.map(x => x.id).includes(wallpaper.id) ? "取消收藏" : "收藏"}</td>
         </tr>
         </table>
         `,
-        footer: `[${window.WallPapers[i].file_type.split('/')[1].toUpperCase()}][${window.WallPapers[i].resolution}][${(window.WallPapers[i].file_size / 1000000).toFixed(2)}M]`,
+        footer: `[${wallpaper.file_type.split('/')[1].toUpperCase()}][${wallpaper.resolution}][${(wallpaper.file_size / 1000000).toFixed(2)}M]`,
         showConfirmButton: false,
         onBeforeOpen: () => {
             downloadImg = async () => {
-                var response = await get(window.WallPapers[i].path, true)
+                var response = await get(wallpaper.path, true)
                 var img = new Uint8Array(response)
                 return img
             }
@@ -103,7 +106,7 @@ showOptions = i => {
             downloadWallPaper = async () => {
                 var img = await downloadImg()
                 var path = utools.showSaveDialog({
-                    defaultPath: `${window.WallPapers[i].path.split('/').pop()}`
+                    defaultPath: `${wallpaper.path.split('/').pop()}`
                 })
                 if (path && img) window.saveImg(path, window.toBuffer(img))
             }
@@ -111,14 +114,20 @@ showOptions = i => {
             setWallPaper = async () => {
                 var img = await downloadImg()
                 if (img) {
-                    var path = window.joinpath(window.getWallpapersFolder().path, window.WallPapers[i].path.split('/').pop())
+                    var path = window.joinpath(window.getWallpapersFolder().path, wallpaper.path.split('/').pop())
                     window.saveImg(path, window.toBuffer(img))
-                    setDesktop(path)
+                    if (window.preferences.customScript[utools.getLocalId()]) {
+                        window.runCommand(window.preferences.customScript[utools.getLocalId()].replace("$file", path), (err, stdout, stderr) => {
+                            if (err) utools.showNotification("脚本出错啦！")
+                        })
+                    } else {
+                        setDesktop(path)
+                    }
                 }
             }
 
             showWallPaper = () => {
-                utools.shellOpenExternal(window.WallPapers[i].path)
+                utools.shellOpenExternal(wallpaper.path)
             }
 
             copyWallPaper = async () => {
@@ -130,6 +139,21 @@ showOptions = i => {
                         icon: "success"
                     })
                 }
+            }
+
+            favIf = () => {
+                if (document.querySelector('#favIf').innerHTML == '取消收藏') {
+                    preferences.favorites.splice(preferences.favorites.map(x => x.id).indexOf(wallpaper.id), 1)
+                    utools.showNotification("已取消收藏")
+                    document.querySelector(`#fav img[src*='${wallpaper.id}']`).remove()
+                    document.querySelector('#favIf').innerHTML = '收藏'
+                    Swal.close()
+                } else {
+                    window.preferences.favorites.push(wallpaper)
+                    utools.showNotification("已收藏")
+                    document.querySelector('#favIf').innerHTML = '取消收藏'
+                }
+                pushData("WallPaperPreferences", window.preferences)
             }
         }
     })
@@ -149,9 +173,13 @@ showPreferences = async () => {
             document.getElementById('sorting').value = window.preferences.sorting;
             document.getElementById('atleast').value = window.preferences.atleast;
             document.getElementById('apikey').value = window.preferences.apikey;
+            document.getElementById('customScript').value = window.preferences.customScript[utools.getLocalId()] || ""
             var sage = document.querySelectorAll("input[name='purity']")[2];
             if (!window.preferences.unlock) sage.parentElement.style.opacity = 0;
             if (!/^[a-zA-Z0-9]{32}$/.test(window.preferences.apikey) || !window.preferences.unlock) sage.disabled = true;
+            showCustomScriptHelp = () => {
+                Swal.fire({ text: "你可以自定义一个脚本来用来替换本插件设置壁纸时所使用的命令，使用$file来表示壁纸的路径，例如：/home/xx/setWallpaper.sh $file" })
+            }
         },
         // backdrop: '#bbb',
         html:
@@ -227,8 +255,14 @@ showPreferences = async () => {
         <tr>
             <td><div class="title">API KEY</div></td>
             <td>
-                <input value="${window.preferences.apikey}" id="apikey" class="swal2-input">
+            <input id="apikey" class="swal2-input">
             </td>
+        </tr>
+        <tr>
+        <td><div class="title"><a href=javascript:showCustomScriptHelp()>壁纸脚本</a></div></td>
+        <td>
+        <input id="customScript" class="swal2-input" placeholder="无特殊需求无需配置">
+        </td>
         </tr>
     </table>`,
         focusConfirm: false,
@@ -249,8 +283,11 @@ showPreferences = async () => {
                 atleast: document.getElementById('atleast').value,
                 apikey: document.getElementById('apikey').value,
                 unlock: window.preferences.unlock,
-                page: window.preferences.page
+                page: window.preferences.page,
+                customScript: JSON.parse(JSON.stringify(window.preferences.customScript)),
+                favorites: window.preferences.favorites
             }
+            data.customScript[utools.getLocalId()] = document.getElementById('customScript').value
             if (JSON.stringify(window.preferences) == JSON.stringify(data)) return "";
             return data;
         }
@@ -277,17 +314,57 @@ searchKeyword = async () => {
         await fetchKeywordWallpaper(result.value)
         if (window.WallPapers.length != 0) {
             updateImgs()
-        }else{
+        } else {
             Swal.fire({
                 text: '所给关键词未查询到内容！'
             })
         }
-        
+
     }
 }
 
+showFavorites = () => {
+    var selector = document.querySelector('#fav')
+    document.querySelector('#closeFav').style.display = 'block'
+    document.querySelectorAll("#footer img").forEach(x => x.style.display = 'none')
+    selector.style.zIndex = "1"
+    selector.classList.remove('hide')
+    selector.classList.add('show')
+    if (!window.preferences.favorites.length) {
+        utools.showNotification("尚未收藏任何壁纸！")
+    }
+    window.preferences.favorites.forEach(wallpaper => {
+        var img = new Image()
+        img.src = wallpaper.thumbs.small
+        img.onclick = function () {
+            showOptions(wallpaper)
+        }
+        selector.appendChild(img)
+    })
+}
+
+
+closeFavorites = () => {
+    var selector = document.querySelector('#fav')
+    document.querySelector('#closeFav').style.display = 'none'
+    document.querySelectorAll("#footer img").forEach(x => x.style.display = 'block')
+    selector.classList.remove('show')
+    selector.classList.add('hide')
+    selector.innerHTML = ""
+    selector.style.zIndex = "-1"
+}
+
+
 document.querySelector('#searchbykeyword').onclick = async function () {
     searchKeyword()
+}
+
+document.querySelector('#showFav').onclick = async function () {
+    showFavorites()
+}
+
+document.querySelector('#closeFav').onclick = async function () {
+    closeFavorites()
 }
 
 document.querySelector('#givemefour').onclick = async function () {
@@ -324,7 +401,7 @@ for (var i = 0; i < 4; i++) {
     var imgbox = document.querySelectorAll('#content .imgbox')[i]
     imgbox.i = i
     imgbox.onclick = function () {
-        showOptions(this.i)
+        showOptions(window.WallPapers[this.i])
     }
 }
 
