@@ -333,7 +333,20 @@ showFavorites = () => {
     if (!window.preferences.favorites.length) {
         utools.showNotification("尚未收藏任何壁纸！")
     }
-    window.preferences.favorites.forEach(wallpaper => {
+    var start = 0
+    var len = 40
+    updateFavorites(selector, start, len)
+    selector.onscroll = function () {
+        if (this.scrollHeight == this.scrollTop + this.clientHeight) {
+            start += len
+            updateFavorites(selector, start, len)
+        }
+    }
+}
+
+
+updateFavorites = (selector, start, len) => {
+    window.preferences.favorites.slice(start, start + len).forEach(wallpaper => {
         var img = new Image()
         img.src = wallpaper.thumbs.small
         img.onclick = function () {
@@ -342,7 +355,6 @@ showFavorites = () => {
         selector.appendChild(img)
     })
 }
-
 
 closeFavorites = () => {
     var selector = document.querySelector('#fav')
