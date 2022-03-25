@@ -73,10 +73,28 @@ utools.onPluginEnter(async () => {
         }
         if (!window.preferences.customScript) window.preferences.customScript = {}
         if (!window.preferences.favorites) window.preferences.favorites = []
+        if (!window.preferences.autoChangeTime) window.preferences.autoChangeTime = 0
         await fetchWallpaper()
         updateImgs()
+        addWallpaperTimer(window.preferences.autoChangeTime)
     }
 })
+
+downloadImg = async url => {
+    var response = await get(url, true)
+    var img = new Uint8Array(response)
+    return img
+}
+
+setWallPaper = async url => {
+    var filepath = window.joinpath(window.getWallpapersFolder().path, url.split('/').pop())
+    if (!window.exists(filepath)) {
+        var img = await downloadImg(url)
+        if (!img) return
+        window.saveImg(filepath, window.toBuffer(img))
+    }
+    window.setDesktop(filepath)
+}
 
 showOptions = wallpaper => {
     Swal.fire({
@@ -85,7 +103,7 @@ showOptions = wallpaper => {
         <table class="optionsTable">
         <tr>
         <td><img class="options" src="img/download.svg" onclick=downloadWallPaper()></td>
-        <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper()></td>
+        <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper("${wallpaper.path}")></td>
         <td><img class="options" src="img/raw.svg" onclick=showWallPaper()></td>
         <td><img class="options" src="img/paste.svg" onclick=copyWallPaper()></td>
         <td><img class="options" src="img/collection.svg" onclick=favIf()></td>
@@ -99,27 +117,12 @@ showOptions = wallpaper => {
         footer: `[${wallpaper.file_type.split('/')[1].toUpperCase()}][${wallpaper.resolution}][${(wallpaper.file_size / 1000000).toFixed(2)}M]`,
         showConfirmButton: false,
         onBeforeOpen: () => {
-            downloadImg = async () => {
-                var response = await get(wallpaper.path, true)
-                var img = new Uint8Array(response)
-                return img
-            }
-
             downloadWallPaper = async () => {
-                var img = await downloadImg()
+                var img = await downloadImg(wallpaper.path)
                 var path = utools.showSaveDialog({
                     defaultPath: `${wallpaper.path.split('/').pop()}`
                 })
                 if (path && img) window.saveImg(path, window.toBuffer(img))
-            }
-
-            setWallPaper = async () => {
-                var img = await downloadImg()
-                if (img) {
-                    var path = window.joinpath(window.getWallpapersFolder().path, wallpaper.path.split('/').pop())
-                    window.saveImg(path, window.toBuffer(img))
-                    window.setDesktop(path)
-                }
             }
 
             showWallPaper = () => {
@@ -128,7 +131,7 @@ showOptions = wallpaper => {
             }
 
             copyWallPaper = async () => {
-                var img = await downloadImg()
+                var img = await downloadImg(wallpaper.path)
                 if (img) {
                     utools.copyImage(img)
                     Swal.fire({
@@ -281,6 +284,7 @@ showPreferences = async () => {
                 apikey: document.getElementById('apikey').value,
                 unlock: window.preferences.unlock,
                 page: window.preferences.page,
+                time: window.preferences.autoChangeTime,
                 customScript: JSON.parse(JSON.stringify(window.preferences.customScript)),
                 favorites: window.preferences.favorites
             }
@@ -301,7 +305,8 @@ showPreferences = async () => {
 
 searchKeyword = async () => {
     var result = await Swal.fire({
-        title: '输入关键词（建议英文）',
+        title: '搜索壁纸',
+        text: '为了提升搜索结果的准确性，建议使用英文关键词',
         input: 'text',
         inputAttributes: {
             autocapitalize: 'off'
@@ -320,10 +325,43 @@ searchKeyword = async () => {
     }
 }
 
+setDesktopFromFavorite = async () => {
+    var randomNumber = Math.floor(Math.random() * window.preferences.favorites.length)
+    var wallpaper = window.preferences.favorites[randomNumber].path
+    console.log(wallpaper);
+    setWallPaper(wallpaper)
+}
+
+addWallpaperTimer = time => {
+    if (time == 0) return
+    setDesktopFromFavorite()
+    window.wallpaperTimer = setInterval(() => {
+        setDesktopFromFavorite()
+    }, time * 60 * 1000);
+}
+
+autoChangeWallpaper = async () => {
+    var result = await Swal.fire({
+        title: '自动更换壁纸',
+        text: '请设置时间间隔（单位：分钟），将每隔一段时间从收藏中随机抽取图片并设为电脑壁纸，如果将时间间隔设置为『0』，则取消自动更换。注意需要将插件设置为『跟随主程序同时启动』（2.6.1版本以上），且取消『隐藏后台时完全退出』才能在开机后在后台自动更换',
+        input: 'number',
+        inputValue: window.preferences.autoChangeTime,
+        showCancelButton: true
+    })
+    if (typeof result.value == 'undefined') return
+    if (parseInt(result.value) == window.preferences.autoChangeTime) return
+    window.preferences.autoChangeTime = parseInt(result.value)
+    if (window.wallpaperTimer) clearInterval(window.wallpaperTimer);
+    window.wallpaperTimer = null;
+    pushData("WallPaperPreferences", window.preferences)
+    addWallpaperTimer(window.preferences.autoChangeTime)
+    utools.showNotification(`自动更换壁纸已${window.preferences.autoChangeTime ? "开启" : "关闭"}`)
+}
+
+
 showFavorites = () => {
     var selector = document.querySelector('#fav')
-    document.querySelector('#closeFav').style.display = 'block'
-    document.querySelectorAll("#footer img").forEach(x => x.style.display = 'none')
+    document.querySelectorAll("#footer img").forEach(x => x.style.display = x.style.display == 'none' ? 'block' : 'none')
     selector.style.zIndex = "1"
     selector.classList.remove('hide')
     selector.classList.add('show')
@@ -345,7 +383,7 @@ showFavorites = () => {
 updateFavorites = (selector, start, len) => {
     window.preferences.favorites.slice(start, start + len).forEach(wallpaper => {
         var img = new Image()
-        img.src = wallpaper.thumbs.small
+        img.src = wallpaper.thumbs.large
         img.onclick = function () {
             showOptions(wallpaper)
         }
@@ -355,14 +393,47 @@ updateFavorites = (selector, start, len) => {
 
 closeFavorites = () => {
     var selector = document.querySelector('#fav')
-    document.querySelector('#closeFav').style.display = 'none'
-    document.querySelectorAll("#footer img").forEach(x => x.style.display = 'block')
+    document.querySelectorAll("#footer img").forEach(x => x.style.display = x.style.display == 'none' ? 'block' : 'none')
     selector.classList.remove('show')
     selector.classList.add('hide')
     selector.innerHTML = ""
     selector.style.zIndex = "-1"
 }
 
+
+givemeFour = async () => {
+    if (window.WallPapers.length >= 8) {
+        window.preferences.historyPapers = window.WallPapers.slice(0, 4)
+        window.WallPapers = window.WallPapers.slice(4)
+    } else {
+        window.preferences.historyPapers = window.WallPapers.slice(window.WallPapers.length - 4)
+        window.preferences.page += 1
+        await fetchWallpaper()
+    }
+    document.getElementById('givemefourback').style.display = 'block'
+    updateImgs()
+}
+
+
+givemeFourBack = async () => {
+    if (window.WallPapers.length >= 8) {
+        window.preferences.historyPapers = window.WallPapers.slice(0, 4)
+        window.WallPapers = window.WallPapers.slice(4)
+    } else {
+        window.preferences.historyPapers = window.WallPapers.slice(window.WallPapers.length - 4)
+        window.preferences.page += 1
+        await fetchWallpaper()
+    }
+    document.getElementById('givemefourback').style.display = 'block'
+    updateImgs()
+}
+
+
+
+document.querySelector('#automatic').onclick = async function () {
+    if (window.preferences.favorites.length < 2) return utools.showNotification("收藏的图片少于2张，无法自动更换壁纸！")
+    autoChangeWallpaper()
+}
 
 document.querySelector('#searchbykeyword').onclick = async function () {
     searchKeyword()
@@ -377,25 +448,11 @@ document.querySelector('#closeFav').onclick = async function () {
 }
 
 document.querySelector('#givemefour').onclick = async function () {
-    if (window.WallPapers.length >= 8) {
-        window.preferences.historyPapers = window.WallPapers.slice(0, 4)
-        window.WallPapers = window.WallPapers.slice(4)
-    } else {
-        window.preferences.historyPapers = window.WallPapers.slice(window.WallPapers.length - 4)
-        window.preferences.page += 1
-        await fetchWallpaper()
-    }
-    document.getElementById('givemefourback').style.display = 'block'
-    updateImgs()
+    givemeFour()
 }
 
 document.querySelector('#givemefourback').onclick = async function () {
-    if (window.preferences.historyPapers) {
-        window.WallPapers = window.preferences.historyPapers.concat(window.WallPapers)
-        window.preferences.historyPapers = ""
-        document.getElementById('givemefourback').style.display = 'none'
-        updateImgs()
-    }
+    givemeFourBack()
 }
 
 document.querySelector('#preference').onclick = function () {

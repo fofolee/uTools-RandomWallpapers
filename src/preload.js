@@ -55,6 +55,7 @@ saveImg = (path, img) => {
 }
 
 joinpath = path.join
+exists = fs.existsSync
 
 setDesktop = path => {
     if (window.preferences.customScript[utools.getLocalId()]) {
