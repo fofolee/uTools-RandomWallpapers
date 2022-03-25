@@ -11,8 +11,6 @@ pushData = (databases, data) => {
     }
 }
 
-runCommand = exec
-
 getWallpapersFolder = () => {
     let exists = 1
     let folder = path.join(utools.getPath("pictures"), "uToolsWallpapers")
@@ -59,6 +57,12 @@ saveImg = (path, img) => {
 joinpath = path.join
 
 setDesktop = path => {
+    if (window.preferences.customScript[utools.getLocalId()]) {
+        exec(window.preferences.customScript[utools.getLocalId()].replace("$file", path), (err, stdout, stderr) => {
+            err && utools.showNotification(stderr)
+            return
+        })
+    }
     if (utools.isMacOs()) {
         exec(`osascript -e 'tell application "System Events" to set picture of desktop 1 to "${path}"'`, (err, stdout, stderr) => {
             err && utools.showNotification(stderr)

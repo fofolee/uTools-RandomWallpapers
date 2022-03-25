@@ -116,13 +116,7 @@ showOptions = wallpaper => {
                 if (img) {
                     var path = window.joinpath(window.getWallpapersFolder().path, wallpaper.path.split('/').pop())
                     window.saveImg(path, window.toBuffer(img))
-                    if (window.preferences.customScript[utools.getLocalId()]) {
-                        window.runCommand(window.preferences.customScript[utools.getLocalId()].replace("$file", path), (err, stdout, stderr) => {
-                            if (err) utools.showNotification("脚本出错啦！")
-                        })
-                    } else {
-                        setDesktop(path)
-                    }
+                    window.setDesktop(path)
                 }
             }
 
