@@ -80,7 +80,9 @@ utools.onPluginEnter(async () => {
 
 showOptions = wallpaper => {
     Swal.fire({
-        html: `<table class="optionsTable">
+        html: `
+        <img style="max-width: 400px" src="${wallpaper.thumbs.large}">
+        <table class="optionsTable">
         <tr>
         <td><img class="options" src="img/download.svg" onclick=downloadWallPaper()></td>
         <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper()></td>
@@ -122,6 +124,7 @@ showOptions = wallpaper => {
 
             showWallPaper = () => {
                 utools.shellOpenExternal(wallpaper.path)
+                // utools.ubrowser.goto(wallpaper.path).run()
             }
 
             copyWallPaper = async () => {
