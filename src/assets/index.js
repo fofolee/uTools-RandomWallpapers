@@ -75,25 +75,8 @@ utools.onPluginEnter(async () => {
     window.MoveHistoricalWallpapers()
     utools.setExpendHeight(480)
     if (!window.WallPapers) {
-        try {
-            window.preferences = utools.db.get("WallPaperPreferences").data;
-        } catch (error) {
-            window.preferences = {
-                categories: "111",
-                purity: "100",
-                sorting: "random",
-                atleast: "2560x1440",
-                apikey: "",
-                unlock: false,
-                page: 1
-            }
-        }
-        if (!window.preferences.customScript) window.preferences.customScript = {}
-        if (!window.preferences.favorites) window.preferences.favorites = []
-        if (!window.preferences.autoChangeTime) window.preferences.autoChangeTime = 0
         await fetchWallpaper()
         updateImgs()
-        addWallpaperTimer(window.preferences.autoChangeTime)
     }
 })
 
@@ -489,3 +472,25 @@ document.onkeydown = e => {
         })
     }
 }
+
+var init = () => {
+    try {
+        window.preferences = utools.db.get("WallPaperPreferences").data;
+    } catch (error) {
+        window.preferences = {
+            categories: "111",
+            purity: "100",
+            sorting: "random",
+            atleast: "2560x1440",
+            apikey: "",
+            unlock: false,
+            page: 1
+        }
+    }
+    if (!window.preferences.customScript) window.preferences.customScript = {}
+    if (!window.preferences.favorites) window.preferences.favorites = []
+    if (!window.preferences.autoChangeTime) window.preferences.autoChangeTime = 0
+    addWallpaperTimer(window.preferences.autoChangeTime)
+}
+
+init()
