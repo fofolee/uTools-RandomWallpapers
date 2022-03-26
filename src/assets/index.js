@@ -1,3 +1,6 @@
+// 手滑了功能出错
+// 暗黑模式下load背景不透明
+
 get = (url, buffer) =>
     new Promise((reslove, reject) => {
         var xhr = new XMLHttpRequest();
