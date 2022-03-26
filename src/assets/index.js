@@ -54,6 +54,23 @@ fetchKeywordWallpaper = async (keyword) => {
     }
 }
 
+toastMsg = (msg, icon = "success") => {
+    Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    }).fire({
+        icon: icon,
+        title: msg
+    })
+}
+
 utools.onPluginEnter(async () => {
     window.MoveHistoricalWallpapers()
     utools.setExpendHeight(480)
@@ -134,23 +151,19 @@ showOptions = wallpaper => {
                 var img = await downloadImg(wallpaper.path)
                 if (img) {
                     utools.copyImage(img)
-                    Swal.fire({
-                        text: "复制完成",
-                        icon: "success"
-                    })
+                    toastMsg("复制完成")
                 }
             }
-
             favIf = () => {
                 if (document.querySelector('#favIf').innerHTML == '取消收藏') {
                     preferences.favorites.splice(preferences.favorites.map(x => x.id).indexOf(wallpaper.id), 1)
-                    utools.showNotification("已取消收藏")
+                    toastMsg("已取消收藏")
                     document.querySelector(`#fav img[src*='${wallpaper.id}']`).remove()
                     document.querySelector('#favIf').innerHTML = '收藏'
                     Swal.close()
                 } else {
                     window.preferences.favorites.push(wallpaper)
-                    utools.showNotification("已收藏")
+                    toastMsg("已收藏")
                     document.querySelector('#favIf').innerHTML = '取消收藏'
                 }
                 pushData("WallPaperPreferences", window.preferences)
@@ -317,9 +330,7 @@ searchKeyword = async () => {
         if (window.WallPapers.length != 0) {
             updateImgs()
         } else {
-            Swal.fire({
-                text: '所给关键词未查询到内容！'
-            })
+            toastMsg('所给关键词未查询到内容！', 'warning')
         }
 
     }
@@ -355,19 +366,17 @@ autoChangeWallpaper = async () => {
     window.wallpaperTimer = null;
     pushData("WallPaperPreferences", window.preferences)
     addWallpaperTimer(window.preferences.autoChangeTime)
-    utools.showNotification(`自动更换壁纸已${window.preferences.autoChangeTime ? "开启" : "关闭"}`)
+    toastMsg(`自动更换壁纸已${window.preferences.autoChangeTime ? "开启" : "关闭"}`)
 }
 
 
 showFavorites = () => {
+    if (!window.preferences.favorites.length) return toastMsg("尚未收藏任何壁纸！", "warning")
     var selector = document.querySelector('#fav')
     document.querySelectorAll("#footer img").forEach(x => x.style.display = x.style.display == 'none' ? 'block' : 'none')
     selector.style.zIndex = "1"
     selector.classList.remove('hide')
     selector.classList.add('show')
-    if (!window.preferences.favorites.length) {
-        utools.showNotification("尚未收藏任何壁纸！")
-    }
     var start = 0
     var len = 40
     updateFavorites(selector, start, len)
@@ -431,7 +440,7 @@ givemeFourBack = async () => {
 
 
 document.querySelector('#automatic').onclick = async function () {
-    if (window.preferences.favorites.length < 2) return utools.showNotification("收藏的图片少于2张，无法自动更换壁纸！")
+    if (window.preferences.favorites.length < 2) return toastMsg("收藏的图片少于2张，无法自动更换壁纸！", "warning")
     autoChangeWallpaper()
 }
 
