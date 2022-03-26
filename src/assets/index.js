@@ -2,7 +2,7 @@ get = (url, buffer) =>
     new Promise((reslove, reject) => {
         var xhr = new XMLHttpRequest();
         if (buffer) xhr.responseType = 'arraybuffer';
-        xhr.timeout = 90000;
+        xhr.timeout = 10000;
         xhr.open('GET', url);
         xhr.send();
         xhr.onreadystatechange = () => {
@@ -11,7 +11,7 @@ get = (url, buffer) =>
                     reslove(xhr.response);
                 } else {
                     console.log(xhr)
-                    utools.showNotification('网络请求出错，状态码：' + xhr.status)
+                    toastMsg(`请求${xhr.status ? "失败，状态码 " + xhr.status : "超时"}`, "error")
                     reslove("")
                 }
             }
