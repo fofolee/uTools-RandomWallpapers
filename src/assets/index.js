@@ -100,6 +100,7 @@ utools.onPluginEnter(async () => {
 downloadImg = async url => {
     var response = await get(url, true)
     var img = new Uint8Array(response)
+    if (!img || !img.length) return false
     return img
 }
 
