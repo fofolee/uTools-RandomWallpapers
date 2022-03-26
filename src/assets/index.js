@@ -412,16 +412,12 @@ givemeFour = async () => {
 
 
 givemeFourBack = async () => {
-    if (window.WallPapers.length >= 8) {
-        window.preferences.historyPapers = window.WallPapers.slice(0, 4)
-        window.WallPapers = window.WallPapers.slice(4)
-    } else {
-        window.preferences.historyPapers = window.WallPapers.slice(window.WallPapers.length - 4)
-        window.preferences.page += 1
-        await fetchWallpaper()
+    if (window.preferences.historyPapers) {
+        window.WallPapers = window.preferences.historyPapers.concat(window.WallPapers)
+        window.preferences.historyPapers = ""
+        document.getElementById('givemefourback').style.display = 'none'
+        updateImgs()
     }
-    document.getElementById('givemefourback').style.display = 'block'
-    updateImgs()
 }
 
 
