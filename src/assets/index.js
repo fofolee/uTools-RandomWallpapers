@@ -343,7 +343,7 @@ autoChangeWallpaper = async () => {
         inputValue: window.preferences.autoChangeTime,
         showCancelButton: true
     })
-    if (result.value == '' || typeof result.value == 'undefined') return toastMsg('请输入正确的数字！', 'error')
+    if (result.value == '' || typeof result.value == 'undefined') return
     if (parseInt(result.value) == window.preferences.autoChangeTime) return
     window.preferences.autoChangeTime = parseInt(result.value)
     if (window.wallpaperTimer) clearInterval(window.wallpaperTimer);
