@@ -344,7 +344,7 @@ setDesktopFromFavorite = async () => {
 }
 
 addWallpaperTimer = time => {
-    if (time == 0) return
+    if (!/^\+?[1-9][0-9]*$/.test(time)) return
     setDesktopFromFavorite()
     window.wallpaperTimer = setInterval(() => {
         setDesktopFromFavorite()
@@ -359,7 +359,7 @@ autoChangeWallpaper = async () => {
         inputValue: window.preferences.autoChangeTime,
         showCancelButton: true
     })
-    if (typeof result.value == 'undefined') return
+    if (result.value == '' || typeof result.value == 'undefined') return toastMsg('请输入正确的数字！', 'error')
     if (parseInt(result.value) == window.preferences.autoChangeTime) return
     window.preferences.autoChangeTime = parseInt(result.value)
     if (window.wallpaperTimer) clearInterval(window.wallpaperTimer);
