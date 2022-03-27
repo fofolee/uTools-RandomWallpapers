@@ -2,7 +2,7 @@ get = (url, buffer) =>
     new Promise((reslove, reject) => {
         var xhr = new XMLHttpRequest();
         if (buffer) xhr.responseType = 'arraybuffer';
-        xhr.timeout = 10000;
+        xhr.timeout = 60000;
         xhr.open('GET', url);
         xhr.send();
         xhr.onreadystatechange = () => {
