@@ -61,10 +61,6 @@ toastMsg = (msg, icon = "success") => {
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: true,
-        didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer)
-            toast.addEventListener('mouseleave', Swal.resumeTimer)
-        }
     }).fire({
         icon: icon,
         title: msg
@@ -335,6 +331,8 @@ setDesktopFromFavorite = async () => {
 }
 
 addWallpaperTimer = time => {
+    if (window.wallpaperTimer) clearInterval(window.wallpaperTimer)
+    window.wallpaperTimer = null
     if (!/^\+?[1-9][0-9]*$/.test(time)) return
     setDesktopFromFavorite()
     window.wallpaperTimer = setInterval(() => {
@@ -346,21 +344,27 @@ autoChangeWallpaper = async () => {
     var result = await Swal.fire({
         title: '自动更换壁纸',
         html: `<p style="text-align: left">将每隔一段时间从收藏中随机抽取图片并设为电脑壁纸。<br>
-        如果将时间间隔设置为<b>『0』</b>，则取消自动更换。<br>
         注意需要将插件设置为<b>『跟随主程序同时启动』</b>（2.6.1版本以上，当前版本<b>${utools.getAppVersion()}</b>${utools.getAppVersion() < '2.6.1' ? '，请到官网进行<a href=javascript:utools.shellOpenExternal("http://u.tools")>升级</a>！' : ''}），且取消<b>『隐藏后台时完全退出』</b>才能在开机后在后台自动更换。<a href="" onclick=document.getElementById("autoStartHelp").style.display='block'>设置方法</a></p><img id="autoStartHelp" style="display: none" width="100%" src="img/autoStart.jpg">
         <p>请设置时间间隔（单位：<b>分钟</b>）</p>`,
         input: 'number',
         inputValue: window.preferences.autoChangeTime,
-        showCancelButton: true
+        showCancelButton: true,
+        confirmButtonText: "启用",
+        cancelButtonText: "停用",
+        cancelButtonColor: '#d33',
+        showCloseButton: true,
     })
-    if (result.value == '' || typeof result.value == 'undefined') return
-    if (parseInt(result.value) == window.preferences.autoChangeTime) return
-    window.preferences.autoChangeTime = parseInt(result.value)
-    if (window.wallpaperTimer) clearInterval(window.wallpaperTimer);
-    window.wallpaperTimer = null;
+    if (result.dismiss) {
+        if (result.dismiss != 'cancel') return
+        window.preferences.autoChangeTime = null
+        toastMsg('已禁用')
+    } else {
+        if (!parseInt(result.value)) return toastMsg("请输入大于 0 的数值", "error")
+        window.preferences.autoChangeTime = parseInt(result.value)
+        toastMsg(`已启用，轮换间隔为 ${result.value} 分钟`)
+    }
     pushData("WallPaperPreferences", window.preferences)
     addWallpaperTimer(window.preferences.autoChangeTime)
-    toastMsg(`自动更换壁纸已${window.preferences.autoChangeTime ? "开启" : "关闭"}`)
 }
 
 
@@ -495,7 +499,6 @@ var init = () => {
     }
     if (!window.preferences.customScript) window.preferences.customScript = {}
     if (!window.preferences.favorites) window.preferences.favorites = []
-    if (!window.preferences.autoChangeTime) window.preferences.autoChangeTime = 0
     addWallpaperTimer(window.preferences.autoChangeTime)
 }
 
