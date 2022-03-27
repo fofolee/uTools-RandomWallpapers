@@ -1,6 +1,3 @@
-// 手滑了功能出错
-// 暗黑模式下load背景不透明
-
 get = (url, buffer) =>
     new Promise((reslove, reject) => {
         var xhr = new XMLHttpRequest();
@@ -74,7 +71,13 @@ toastMsg = (msg, icon = "success") => {
     })
 }
 
+toggleDarkMode = () => {
+    var isDark = utools.isDarkColors()
+    document.querySelector("#swalTheme").href = isDark ? "assets/wordpress-admin.min.css" : ""
+}
+
 utools.onPluginEnter(async () => {
+    toggleDarkMode()
     window.MoveHistoricalWallpapers()
     utools.setExpendHeight(480)
     if (!window.WallPapers) {
@@ -103,7 +106,7 @@ setWallPaper = async url => {
 showOptions = wallpaper => {
     Swal.fire({
         html: `
-        <img style="max-width: 400px" src="${wallpaper.thumbs.large}">
+        <img style="max-width: 100%" src="${wallpaper.thumbs.large}">
         <table class="optionsTable">
         <tr>
         <td><img class="options" src="img/download.svg" onclick=downloadWallPaper()></td>
@@ -267,6 +270,7 @@ showPreferences = async () => {
     </table>`,
         focusConfirm: false,
         confirmButtonText: '保存',
+        showCancelButton: true,
         preConfirm: async () => {
             var categories = "";
             for (var i of document.querySelectorAll("input[name='categories']")) {

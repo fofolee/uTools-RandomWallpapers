@@ -39,8 +39,7 @@ body {
     right: 0px;
     bottom: 0px;
     left: 0px;
-    background: #f3f3f3;
-    box-shadow: 0px 0px 9px 0px #607D8B;
+    box-shadow: 0px 0px 9px 0px #000000c2;
 }
 
 
@@ -102,6 +101,10 @@ body {
 .options {
     cursor: pointer;
     width: 45px;
+}
+
+a {
+    color: #438bca;
 }
 
 .options:hover {
