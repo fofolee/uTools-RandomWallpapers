@@ -129,8 +129,11 @@ showOptions = wallpaper => {
             }
 
             showWallPaper = () => {
-                utools.shellOpenExternal(wallpaper.path)
-                // utools.ubrowser.goto(wallpaper.path).run()
+                // utools.shellOpenExternal(wallpaper.path)
+                utools.ubrowser.goto(wallpaper.path).run({
+                    width: 1420,
+                    height: 830
+                })
             }
 
             copyWallPaper = async () => {
