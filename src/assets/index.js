@@ -106,7 +106,7 @@ showOptions = wallpaper => {
         <table class="optionsTable">
         <tr>
         <td><img class="options" src="img/download.svg" onclick=downloadWallPaper()></td>
-        <td><img class="options" src="img/wallpaper.svg" onclick=setWallPaper("${wallpaper.path}")></td>
+        <td><img class="options" src="img/wallpaper.svg" onclick=setDesktopWallpaper()></td>
         <td><img class="options" src="img/raw.svg" onclick=showWallPaper()></td>
         <td><img class="options" src="img/paste.svg" onclick=copyWallPaper()></td>
         <td><img class="options" src="img/collection.svg" onclick=favIf()></td>
@@ -125,7 +125,15 @@ showOptions = wallpaper => {
                 var path = utools.showSaveDialog({
                     defaultPath: `${wallpaper.path.split('/').pop()}`
                 })
-                if (path && img) window.saveImg(path, window.toBuffer(img))
+                if (path && img) {
+                    window.saveImg(path, window.toBuffer(img))
+                    toastMsg('下载成功')
+                }
+            }
+
+            setDesktopWallpaper = async () => {
+                setWallPaper(wallpaper.path)
+                toastMsg('请稍候', 'info')
             }
 
             showWallPaper = () => {
@@ -147,13 +155,11 @@ showOptions = wallpaper => {
                 if (document.querySelector('#favIf').innerHTML == '取消收藏') {
                     preferences.favorites.splice(preferences.favorites.map(x => x.id).indexOf(wallpaper.id), 1)
                     toastMsg("已取消收藏")
-                    document.querySelector(`#fav img[src*='${wallpaper.id}']`).remove()
-                    document.querySelector('#favIf').innerHTML = '收藏'
-                    Swal.close()
+                    var favImg = document.querySelector(`#fav img[src*='${wallpaper.id}']`)
+                    if (favImg) favImg.remove()
                 } else {
                     window.preferences.favorites.push(wallpaper)
                     toastMsg("已收藏")
-                    document.querySelector('#favIf').innerHTML = '取消收藏'
                 }
                 pushData("WallPaperPreferences", window.preferences)
             }
