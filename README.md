@@ -1,4 +1,4 @@
-# 随机壁纸 0.0.9
+# 随机壁纸 1.0.0
 
 ## 简介
 
@@ -13,7 +13,7 @@
 桌面壁纸用久了就有些腻了，这时候可以随机获取几张壁纸，设为桌面，换换壁纸，换换心情~
 
 
-![](https://s2.loli.net/2022/03/25/S8xBdtLkyMqpW1E.jpg)
-![](https://s2.loli.net/2022/03/25/9PDgndMlOpXUCam.jpg)
-![](https://s2.loli.net/2022/03/25/pNb1WG59VuUkIMT.jpg)
-![](https://s2.loli.net/2022/03/25/EkJr4wKxlAmFiaI.jpg)
+![](https://s2.loli.net/2022/03/27/xKVmw9JOADRqkHF.jpg)
+![](https://s2.loli.net/2022/03/27/65n9CvSIdUieb8R.jpg)
+![](https://s2.loli.net/2022/03/27/ix6Z7kdlAabUmwL.jpg)
+![](https://s2.loli.net/2022/03/27/Ymr1TiSHa8FeUbh.jpg)
