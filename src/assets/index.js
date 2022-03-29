@@ -293,7 +293,7 @@ showPreferences = async () => {
                 apikey: document.getElementById('apikey').value,
                 unlock: window.preferences.unlock,
                 page: window.preferences.page,
-                time: window.preferences.autoChangeTime,
+                autoChangeTime: window.preferences.autoChangeTime,
                 customScript: JSON.parse(JSON.stringify(window.preferences.customScript)),
                 favorites: window.preferences.favorites
             }
