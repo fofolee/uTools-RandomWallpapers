@@ -50,8 +50,8 @@ toBuffer = arraybuffer => {
     return Buffer.from(arraybuffer)
 }
 
-saveImg = (path, img) => {
-    fs.writeFileSync(path, img)
+saveFile = (path, data) => {
+    fs.writeFileSync(path, data)
 }
 
 joinpath = path.join

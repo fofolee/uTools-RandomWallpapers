@@ -9,6 +9,14 @@ body {
     display: block;
 }
 
+#content {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 30px;
+}
+
 .imgbox {
     width: 50%;
     height: 50%;
