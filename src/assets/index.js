@@ -47,7 +47,39 @@ const updateImgs = () => {
   }
 }
 
-const baseUrl = 'https://wall.alphacoders.com/'
+const baseConfig = {
+  categories: {
+    abstract: { name: "抽象", url: "https://alphacoders.com/abstract-wallpapers" },
+    animal: { name: "动物", url: "https://alphacoders.com/animal-wallpapers" },
+    anime: { name: "动漫", url: "https://alphacoders.com/anime-wallpapers" },
+    artistic: { name: "艺术", url: "https://alphacoders.com/artistic-wallpapers" },
+    celebrity: { name: "名人", url: "https://alphacoders.com/celebrity-wallpapers" },
+    comic: { name: "漫画", url: "https://alphacoders.com/comic-wallpapers" },
+    fantasy: { name: "奇幻", url: "https://alphacoders.com/fantasy-wallpapers" },
+    food: { name: "美食", url: "https://alphacoders.com/food-wallpapers" },
+    man_made: { name: "人造", url: "https://alphacoders.com/man-made-wallpapers" },
+    humor: { name: "杂项", url: "https://alphacoders.com/humor-wallpapers" },
+    movie: { name: "电影", url: "https://alphacoders.com/movie-wallpapers" },
+    nature: { name: "自然", url: "https://alphacoders.com/nature-wallpapers" },
+    photography: { name: "摄影", url: "https://alphacoders.com/photography-wallpapers" },
+    sci_fi: { name: "科幻", url: "https://alphacoders.com/sci-fi-wallpapers" },
+    sports: { name: "运动", url: "https://alphacoders.com/sports-wallpapers" },
+    tv_show: { name: "电视节目", url: "https://alphacoders.com/tv-show-wallpapers" },
+    vehicle: { name: "交通工具", url: "https://alphacoders.com/vehicle-wallpapers" },
+    video_game: { name: "游戏", url: "https://alphacoders.com/video-game-wallpapers" },
+    woman: { name: "女人", url: "https://alphacoders.com/woman-wallpapers" }
+  },
+  sorting: {
+    search: { name: '搜索', url: 'https://wall.alphacoders.com/search.php' },
+    newest_wallpapers: { name: '最近', url: "https://alphacoders.com/newest-wallpapers", },
+    random: { name: '随机', url: "https://wall.alphacoders.com/random.php" },
+    by_views: { name: '浏览量', url: "https://wall.alphacoders.com/by_views.php" },
+    by_favorites: { name: '收藏量', url: "https://wall.alphacoders.com/by_favorites.php" },
+    popular: { name: '近期排行', url: "https://alphacoders.com/popular-wallpapers" },
+    by_category: { name: '按分类', url: "https://wall.alphacoders.com/by_category.php" },
+  },
+}
+
 
 const shuffleArray = (arr) => {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -58,25 +90,29 @@ const shuffleArray = (arr) => {
 }
 
 const parseHtmlResponse = (response) => {
-  response = new DOMParser().parseFromString(response, 'text/html')
-  let result = Array.from(response.querySelectorAll('.thumb-container')).map(
+    response = new DOMParser().parseFromString(response, 'text/html')
+    console.log("response:", response);
+    let doms = Array.from(response.querySelectorAll('.thumb-container,#container_thumbs_hidden .item'))
+    console.log("doms:", doms);
+    let result = doms.map(
     (dom) => {
       let thumbs = {
-        small: dom.querySelector('.boxgrid picture > source:nth-child(2)')
+        small: dom.querySelector('picture > :first-child')
           .srcset,
-        big: dom.querySelector('.boxgrid picture > source:nth-child(3)').srcset,
+          big: dom.querySelector('picture > :last-child').src,
       }
-      let thumbInfo = dom.querySelector('.thumb-info').innerText
-      let imageId = dom.querySelector('.boxgrid a').href.split('=').pop()
-      let imageType = thumbs.small.split('/').pop().split('.').pop()
+            let thumbInfo = dom.querySelector('.thumb-info,.thumb-info-masonry').innerText
+            console.log(thumbInfo);
+      let imageId = dom.querySelector('a').href.split('=').pop()
+      let imageType = thumbs.big.split('/').pop().split('.').pop()
       let imageFolder = thumbs.small.split('.')[0].split('//').pop()
       let imageLink = `https://initiate.alphacoders.com/download/${imageFolder}/${imageId}/${imageType}`
       return {
         id: imageId,
         thumbs: thumbs,
         path: imageLink,
-        title: thumbInfo.split('-').pop().trim(),
-        resolution: thumbInfo.split('-')[0].trim(),
+        // title: thumbInfo.split('-').pop().trim(),
+        resolution: /\d{3,4}x\d{3,4}/.exec(thumbInfo)?.[0],
         type: imageType,
       }
     },
@@ -88,26 +124,27 @@ const parseHtmlResponse = (response) => {
 
 const fetchWallpaper = async () => {
   let url =
-    baseUrl +
-    (window.preferences.sorting !== 'by_category'
-      ? `${window.preferences.sorting}.php?page=${window.preferences.page}`
-      : `by_category.php?id=${window.preferences.categories}&page=${Math.floor(
-          Math.random() * 333,
-        )}`)
+    window.preferences.sorting === "by_category"
+      ? `${
+          baseConfig.categories[window.preferences.categories].url
+        }?page=${Math.floor(Math.random() * 200)}`
+      : `${baseConfig.sorting[window.preferences.sorting].url}?page=${
+          window.preferences.page
+        }`;
   try {
-    let response = await httpRequest(url)
-    window.WallPapers = parseHtmlResponse(response)
-    console.log(window.WallPapers)
+    let response = await httpRequest(url);
+    window.WallPapers = parseHtmlResponse(response);
+    console.log("window.WallPapers:", window.WallPapers);
   } catch (e) {
-    console.log(e)
-    toastMsg(e, 'error')
+    console.log(e);
+    toastMsg(e, "error");
   }
-}
+};
 
 const fetchKeywordWallpaper = async (keyword) => {
   try {
     let response = await httpRequest(
-      baseUrl + `search.php?search=${keyword}&page=${window.preferences.page}`,
+      `${baseConfig.sorting.search}?search=${keyword}&page=${window.preferences.page}`,
     )
     window.WallPapers = parseHtmlResponse(response)
   } catch (e) {
@@ -191,16 +228,16 @@ const showOptions = (wallpaper) => {
         </tr>
         </table>
         `,
-    footer: `<div style="text-align: center">${
-      wallpaper.title
-    }<br/>${wallpaper.type.toUpperCase()} - ${wallpaper.resolution}</div>`,
-    // + `[${(wallpaper.file_size / 1000000).toFixed(2)}M]`
+      footer:
+          // <div style="text-align: center">${wallpaper.title}<br/>`+
+          `${wallpaper.type.toUpperCase()} - ${wallpaper.resolution}</div>`,
+      // + `[${(wallpaper.file_size / 1000000).toFixed(2)}M]`
     showConfirmButton: false,
     onBeforeOpen: () => {
       downloadWallPaper = async () => {
         var img = await downloadImg(wallpaper.path)
         var path = utools.showSaveDialog({
-          defaultPath: `${wallpaper.title}.${wallpaper.type}`,
+            defaultPath: `${wallpaper.path.split("/").slice(-2).join('.') }`,
         })
         if (path && img) {
           window.saveFile(path, window.toBuffer(img))
@@ -249,48 +286,16 @@ const showOptions = (wallpaper) => {
   })
 }
 
-const preferenceSelections = {
-  categories: {
-    '1': '抽象',
-    '2': '动物',
-    '3': '动漫',
-    '4': '艺术',
-    '7': '名人',
-    '8': '漫画',
-    '11': '奇幻',
-    '12': '美食',
-    '16': '人造',
-    '18': '军事',
-    '19': '杂项',
-    '20': '电影',
-    '10': '自然',
-    '24': '摄影',
-    '27': '科幻',
-    '28': '运动',
-    '29': '电视节目',
-    '31': '交通工具',
-    '32': '游戏',
-    '33': '女人',
-  },
-  sorting: {
-    newest_wallpapers: '最近',
-    random: '随机',
-    by_views: '浏览量',
-    by_favorites: '收藏量',
-    popular: '近期排行',
-    by_category: '按分类',
-  },
-}
-
 const createPreferenceSelections = (preferenceSelections) => {
   Object.keys(preferenceSelections).forEach((domId) => {
     let selectDom = document.getElementById(domId)
-    let selectOptions = preferenceSelections[domId]
-    for (const key in preferenceSelections[domId]) {
-      if (selectOptions.hasOwnProperty(key)) {
+      let selectOptions = preferenceSelections[domId]
+      for (const key in selectOptions) {
+        if (selectOptions.hasOwnProperty(key)) {
+        if (key === 'search') continue
         const option = document.createElement('option')
         option.value = key
-        option.textContent = selectOptions[key]
+        option.textContent = selectOptions[key].name
         selectDom.appendChild(option)
       }
     }
@@ -302,7 +307,7 @@ const showPreferences = async () => {
   var result = await Swal.fire({
     title: '偏好设置',
     onBeforeOpen: () => {
-      createPreferenceSelections(preferenceSelections)
+      createPreferenceSelections(baseConfig)
       document.getElementById('sorting').value = window.preferences.sorting
       document.getElementById('categories').value =
         window.preferences.categories
