@@ -147,7 +147,7 @@ const parseHtmlResponse = (response) => {
       let thumbInfo = dom.querySelector(
         ".thumb-info,.thumb-info-masonry"
       ).innerText;
-      // console.log(thumbInfo);
+      //   console.log(thumbInfo);
       let imageId = dom.querySelector("a").href.split("=").pop();
       let imageType = thumbs.big.split("/").pop().split(".").pop();
       let imageFolder = thumbs.small.split(".")[0].split("//").pop();
